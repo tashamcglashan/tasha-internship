@@ -1,0 +1,11 @@
+/* You can put this in your main App.css or global stylesheet */
+.slick-prev,
+.slick-next {
+  z-index: 10;
+}
+
+.slick-prev:before,
+.slick-next:before {
+  color: black; /* or white if your background is dark */
+  font-size: 30px;
+}
