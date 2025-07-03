@@ -1,3 +1,4 @@
+// Author.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
@@ -5,8 +6,9 @@ import AuthorItems from "../components/author/AuthorItems";
 
 const Author = () => {
   const { authorId } = useParams();
-  const [author, setAuthor] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [authorData, setAuthorData] = useState(null);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followers, setFollowers] = useState(0);
 
   useEffect(() => {
     const fetchAuthor = async () => {
@@ -14,78 +16,58 @@ const Author = () => {
         const response = await axios.get(
           `https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=${authorId}`
         );
-        setAuthor(response.data);
-      } catch (error) {
-        console.error("Error fetching author:", error);
-      } finally {
-        setLoading(false);
+        setAuthorData(response.data);
+        setFollowers(response.data.followers);
+      } catch (err) {
+        console.error("Failed to fetch author data", err);
       }
     };
-
     fetchAuthor();
   }, [authorId]);
 
-  if (loading || !author) {
-    return (
-      <div className="container text-center mt-5">
-        <h3>Loading author profile...</h3>
-      </div>
-    );
-  }
+  const toggleFollow = () => {
+    setIsFollowing(!isFollowing);
+    setFollowers((prev) => (isFollowing ? prev - 1 : prev + 1));
+  };
+
+  if (!authorData) return <p>Loading...</p>;
 
   return (
     <div id="wrapper">
       <div className="no-bottom no-top" id="content">
-        <div id="top"></div>
-
         <section
           id="profile_banner"
-          aria-label="section"
           className="text-light"
-          style={{ background: `url(${author.authorBanner}) top` }}
+          style={{ backgroundImage: `url(${authorData.banner})`, backgroundSize: "cover" }}
         ></section>
 
-        <section aria-label="section">
+        <section>
           <div className="container">
             <div className="row">
               <div className="col-md-12">
                 <div className="d_profile de-flex">
                   <div className="de-flex-col">
                     <div className="profile_avatar">
-                      <img src={author.authorImage} alt={author.authorName} />
+                      <img src={authorData.authorImage} alt="author" />
                       <i className="fa fa-check"></i>
-
                       <div className="profile_name">
                         <h4>
-                          {author.authorName}
-                          <span className="profile_username">
-                            @{author.tag}
-                          </span>
-                          <span id="wallet" className="profile_wallet">
-                            {author.walletAddress}
-                          </span>
-                          <button
-                            id="btn_copy"
-                            title="Copy Wallet"
-                            onClick={() =>
-                              navigator.clipboard.writeText(author.walletAddress)
-                            }
-                          >
+                          {authorData.authorName}
+                          <span className="profile_username">@{authorData.tag}</span>
+                          <span className="profile_wallet">{authorData.address}</span>
+                          <button title="Copy Text" onClick={() => navigator.clipboard.writeText(authorData.address)}>
                             Copy
                           </button>
                         </h4>
                       </div>
                     </div>
                   </div>
-
                   <div className="profile_follow de-flex">
                     <div className="de-flex-col">
-                      <div className="profile_follower">
-                        {author.followers} followers
-                      </div>
-                      <Link to="#" className="btn-main">
-                        Follow
-                      </Link>
+                      <div className="profile_follower">{followers} followers</div>
+                      <button className="btn-main" onClick={toggleFollow}>
+                        {isFollowing ? "Unfollow" : "Follow"}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -93,7 +75,7 @@ const Author = () => {
 
               <div className="col-md-12">
                 <div className="de_tab tab_simple">
-                  <AuthorItems authorId={authorId} />
+                  <AuthorItems items={authorData.nftCollection} />
                 </div>
               </div>
             </div>
