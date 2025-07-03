@@ -7,6 +7,8 @@ const Author = () => {
   const { authorId } = useParams();
   const [author, setAuthor] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [followers, setFollowers] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     const fetchAuthor = async () => {
@@ -24,6 +26,17 @@ const Author = () => {
 
     fetchAuthor();
   }, [authorId]);
+
+  useEffect(() => {
+    if (author) {
+      setFollowers(author.followers);
+    }
+  }, [author]);
+
+  const handleFollowToggle = () => {
+    setIsFollowing((prev) => !prev);
+    setFollowers((prev) => prev + (isFollowing ? -1 : 1));
+  };
 
   if (loading || !author) {
     return (
@@ -54,7 +67,6 @@ const Author = () => {
                     <div className="profile_avatar">
                       <img src={author.authorImage} alt={author.authorName} />
                       <i className="fa fa-check"></i>
-
                       <div className="profile_name">
                         <h4>
                           {author.authorName}
@@ -81,11 +93,11 @@ const Author = () => {
                   <div className="profile_follow de-flex">
                     <div className="de-flex-col">
                       <div className="profile_follower">
-                        {author.followers} followers
+                        {followers} followers
                       </div>
-                      <Link to="#" className="btn-main">
-                        Follow
-                      </Link>
+                      <button className="btn-main" onClick={handleFollowToggle}>
+                        {isFollowing ? "Unfollow" : "Follow"}
+                      </button>
                     </div>
                   </div>
                 </div>
