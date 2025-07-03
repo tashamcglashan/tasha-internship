@@ -1,124 +1,119 @@
 import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
-import Slider from "react-slick";
-import { Link } from "react-router-dom";
-import Countdown from "react-countdown";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import "./NewItems.css"; 
+import AuthorItems from "../components/author/AuthorItems";
 
-const NewItems = () => {
-  const [items, setItems] = useState([]);
+const Author = () => {
+  const { authorId } = useParams();
+  const [author, setAuthor] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [followers, setFollowers] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
-    const fetchNewItems = async () => {
+    const fetchAuthor = async () => {
       try {
         const response = await axios.get(
-          "https://us-central1-nft-cloud-functions.cloudfunctions.net/newItems"
+          `https://us-central1-nft-cloud-functions.cloudfunctions.net/authors?author=${authorId}`
         );
-        setItems(response.data);
+        setAuthor(response.data);
       } catch (error) {
-        console.error("Error fetching new items:", error);
+        console.error("Error fetching author:", error);
       } finally {
-        setTimeout(() => setLoading(false), 500);
+        setLoading(false);
       }
     };
 
-    fetchNewItems();
-  }, []);
+    fetchAuthor();
+  }, [authorId]);
 
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 4,
-    slidesToScroll: 1,
-    arrows: true,
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
-    ],
+  useEffect(() => {
+    if (author) {
+      setFollowers(author.followers);
+    }
+  }, [author]);
+
+  const handleFollowToggle = () => {
+    setIsFollowing((prev) => !prev);
+    setFollowers((prev) => prev + (isFollowing ? -1 : 1));
   };
 
-  return (
-    <section id="section-items" className="no-bottom">
-      <div className="container">
-        <div className="text-center mb-4">
-          <h2>New Items</h2>
-          <div className="small-border bg-color-2"></div>
-        </div>
+  if (loading || !author) {
+    return (
+      <div className="container text-center mt-5">
+        <h3>Loading author profile...</h3>
+      </div>
+    );
+  }
 
-        <Slider {...settings}>
-          {(loading ? Array.from({ length: 4 }) : items).map((item, index) => (
-            <div key={index}>
-              <div className="nft__item px-3">
-                {loading ? (
-                  <>
-                    <div className="author_list_pp">
-                      <div className="skeleton-circle" />
-                    </div>
-                    <div className="de_countdown skeleton-box" />
-                    <div className="nft__item_wrap">
-                      <div className="skeleton-box" style={{ height: "250px" }} />
-                    </div>
-                    <div className="nft__item_info">
-                      <div className="skeleton-info" />
-                      <div className="skeleton-info" style={{ width: "40%" }} />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="author_list_pp">
-                      <Link to={`/author/${item.authorId}`}>
-                        <img className="lazy" src={item.authorImage} alt="author" />
-                        <i className="fa fa-check"></i>
-                      </Link>
-                    </div>
-                    <div className="de_countdown">
-                      <Countdown date={item.expiryDate} />
-                    </div>
-                    <div className="nft__item_wrap">
-                      <div className="nft__item_extra">
-                        <div className="nft__item_buttons">
-                          <button>Buy Now</button>
-                          <div className="nft__item_share">
-                            <h4>Share</h4>
-                            <a href="#"><i className="fa fa-facebook fa-lg" /></a>
-                            <a href="#"><i className="fa fa-twitter fa-lg" /></a>
-                            <a href="#"><i className="fa fa-envelope fa-lg" /></a>
-                          </div>
-                        </div>
-                      </div>
-                      <Link to={`/item-details/${item.nftId}`}>
-                        <img
-                          src={item.nftImage}
-                          className="lazy nft__item_preview"
-                          alt="nft"
-                        />
-                      </Link>
-                    </div>
-                    <div className="nft__item_info">
-                      <Link to={`/item-details/${item.nftId}`}>
-                      <img src={item.nftImage} alt={item.tile} className="lazy nft__item-preview" />
-                        <h4>{item.title}</h4>
-                      </Link>
-                      <div className="nft__item_price">{item.price} ETH</div>
-                      <div className="nft__item_like">
-                        <i className="fa fa-heart"></i>
-                        <span>{item.likes}</span>
+  return (
+    <div id="wrapper">
+      <div className="no-bottom no-top" id="content">
+        <div id="top"></div>
+
+        <section
+          id="profile_banner"
+          aria-label="section"
+          className="text-light"
+          style={{ background: `url(${author.authorBanner}) top` }}
+        ></section>
+
+        <section aria-label="section">
+          <div className="container">
+            <div className="row">
+              <div className="col-md-12">
+                <div className="d_profile de-flex">
+                  <div className="de-flex-col">
+                    <div className="profile_avatar">
+                      <img src={author.authorImage} alt={author.authorName} />
+                      <i className="fa fa-check"></i>
+                      <div className="profile_name">
+                        <h4>
+                          {author.authorName}
+                          <span className="profile_username">
+                            @{author.tag}
+                          </span>
+                          <span id="wallet" className="profile_wallet">
+                            {author.walletAddress}
+                          </span>
+                          <button
+                            id="btn_copy"
+                            title="Copy Wallet"
+                            onClick={() =>
+                              navigator.clipboard.writeText(author.walletAddress)
+                            }
+                          >
+                            Copy
+                          </button>
+                        </h4>
                       </div>
                     </div>
-                  </>
-                )}
+                  </div>
+
+                  <div className="profile_follow de-flex">
+                    <div className="de-flex-col">
+                      <div className="profile_follower">
+                        {followers} followers
+                      </div>
+                      <button className="btn-main" onClick={handleFollowToggle}>
+                        {isFollowing ? "Unfollow" : "Follow"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-12">
+                <div className="de_tab tab_simple">
+                  <AuthorItems authorId={authorId} />
+                </div>
               </div>
             </div>
-          ))}
-        </Slider>
+          </div>
+        </section>
       </div>
-    </section>
+    </div>
   );
 };
 
-export default NewItems;
+export default Author;
