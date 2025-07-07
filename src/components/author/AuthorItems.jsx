@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const AuthorItems = ({ items }) => {
+const AuthorItems = ({ items, imagecollect }) => {
   return (
     <div className="de_tab_content">
       <div className="tab-1">
@@ -11,7 +11,7 @@ const AuthorItems = ({ items }) => {
               <div className="nft__item">
                 <div className="author_list_pp">
                   <Link to={`/author/${item.authorId}`}>
-                    <img className="lazy" src={item.authorImage} alt={item.title} />
+                    <img className="lazy" src={imagecollect} alt={item.title} />
                     <i className="fa fa-check"></i>
                   </Link>
                 </div>

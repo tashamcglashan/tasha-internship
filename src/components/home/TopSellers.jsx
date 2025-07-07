@@ -65,8 +65,8 @@ const TopSellers = () => {
                       ) : (
                         <>
                           <Link to={`/author/${seller.authorId}`}>
-                            {seller.authorName}
-                          </Link>
+  <img src={seller.authorImage} alt={seller.authorName} />
+</Link>
                           <span>{seller.price} ETH</span>
                         </>
                       )}
