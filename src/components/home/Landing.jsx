@@ -15,7 +15,7 @@ const Landing = () => {
       <div className="v-center">
         <div className="container">
           <div className="row align-items-center">
-            {/* 👇 Fade-up effect on text column */}
+            {/* Left side with text */}
             <div className="col-md-6" data-aos="fade-up">
               <div className="spacer-single"></div>
               <h6>
@@ -28,7 +28,7 @@ const Landing = () => {
               <p className="lead">
                 Unit of data stored on a digital ledger, called a blockchain,
                 that certifies a digital asset to be unique and therefore not
-                interchangeable
+                interchangeable.
               </p>
               <div className="spacer-10"></div>
               <Link className="btn-main lead" to="/explore">
@@ -37,9 +37,9 @@ const Landing = () => {
               <div className="mb-sm-30"></div>
             </div>
 
-            {/* 👇 Zoom-in-up effect on image column */}
+            {/* Right side with image */}
             <div className="col-md-6 xs-hide" data-aos="zoom-in-up">
-              <img src={NFT} className="lazy img-fluid" alt="" />
+              <img src={NFT} className="lazy img-fluid" alt="NFT" />
             </div>
           </div>
         </div>
