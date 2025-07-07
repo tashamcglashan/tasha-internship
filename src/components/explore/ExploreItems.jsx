@@ -48,6 +48,7 @@ const ExploreItems = () => {
         <div
           key={index}
           className="d-item col-lg-3 col-md-6 col-sm-6 col-xs-12"
+          data-aos="fade-up"
           style={{ display: "block" }}
         >
           <div className="nft__item">
@@ -108,5 +109,5 @@ const ExploreItems = () => {
     </>
   );
 };
-
+//testing comment
 export default ExploreItems;
